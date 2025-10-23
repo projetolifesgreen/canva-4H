@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Canva Life 4H — Life’s Green</title>
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Libs para exportação -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root{
+      --verde-prim:#30B27F; /* principal */
+      --verde-sec:#4f7335; /* secundário */
+      --bg:#f7faf5;--card:#fff;--borda:#d6e2c7;--texto:#121612;--thead:#eef3e6
+    }
+    *{box-sizing:border-box}
+    body{font-family:'Antonio',sans-serif;background:var(--bg);color:var(--texto);margin:0}
+    header{display:flex;align-items:center;justify-content:center;gap:14px;background:linear-gradient(90deg,var(--verde-prim),var(--verde-sec));color:#fff;padding:24px 28px;border-bottom:4px solid #1f7f5a;flex-wrap:wrap;text-align:center;position:relative}
+    header h1{flex-basis:100%;margin:0;font-size:42px;letter-spacing:.6px}
+    header p{flex-basis:100%;margin:6px 0 0;font-size:16px;opacity:.95}
+    header img{position:absolute;right:16px;top:10px;height:62px}
+
+    main{max-width:1160px;margin:28px auto;padding:0 16px}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+    .btn{background:var(--verde-prim);border:0;color:#fff;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;transition:.2s}
+    .btn:hover{background:#25a272;transform:scale(1.03)}
+    .pill{border:1px solid var(--borda);padding:8px 10px;border-radius:10px;background:#fff}
+
+    section{background:var(--card);border:2px solid var(--borda);border-radius:14px;padding:18px;margin:0 0 18px;box-shadow:0 6px 18px rgba(48,178,127,.12)}
+    h2{color:var(--verde-sec);margin:0 0 10px;border-bottom:2px solid var(--verde-prim);padding-bottom:6px;display:flex;align-items:center;gap:8px}
+    h2 .emoji{font-size:20px}
+    p.help{margin:6px 0 12px;color:#5a6a4a;font-size:14px}
+    textarea,input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--borda);font-family:inherit;font-size:15px;background:#fbfff8}
+    textarea{min-height:88px;resize:vertical}
+    .row{display:flex;gap:18px;flex-wrap:wrap}
+    .col{flex:1 1 320px}
+
+    table{width:100%;border-collapse:collapse;margin-top:8px;table-layout:fixed}
+    th,td{border:1px solid var(--borda);padding:8px;vertical-align:top;text-align:left}
+    th{background:var(--thead)}
+    td>input,td>textarea,td>select{width:100%;display:block}
+    td button.btn{display:block;margin:auto} /* centraliza o Remover */
+
+    .num{width:44px;text-align:center;font-weight:700}
+
+    /* Evitar cortes no PDF */
+    @media print { section, table { page-break-inside: avoid; } }
+    .avoid-break { page-break-inside: avoid; break-inside: avoid; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Canva Life 4H</h1>
+    <p>A Life's Green criou essa ferramenta para tornar a criação de projetos de impacto ainda mais fácil</p>
+    <img src="Life’s green.png" alt="Logo Life’s Green">
+  </header>
+
+  <main id="captureArea" class="avoid-break">
+    <div class="toolbar">
+      <button class="btn" id="saveBtn">Salvar</button>
+      <button class="btn" id="loadBtn">Carregar</button>
+      <button class="btn" id="exportPdfBtn">Exportar PDF</button>
+      <button class="btn" id="exportPngBtn">Exportar PNG</button>
+      <span class="pill" id="status">Pronto</span>
+    </div>
+
+    <!-- 1. DIAGNÓSTICO -->
+    <section class="avoid-break">
+      <h2><span class="emoji">🌳</span>1) Diagnóstico — Defina a Dor</h2>
+      <p class="help">Descreva o problema que deseja resolver e identifique os agentes-chave.</p>
+      <div class="row">
+        <div class="col"><label>Problema central</label><textarea id="desafio" placeholder="Descreva o problema..."></textarea></div>
+        <div class="col"><label>Contexto e recorte</label><textarea id="contexto" placeholder="Local, público-alvo, políticas, riscos e oportunidades..."></textarea></div>
+      </div>
+    </section>
+
+    <!-- 2. STAKEHOLDERS + GOLDEN CIRCLE -->
+    <section class="avoid-break">
+      <h2><span class="emoji">🌿</span>2) Stakeholders mapeados + Golden Circle</h2>
+      <div class="row">
+        <div class="col">
+          <p class="help">Mapeie os agentes (Quádrupla Hélice) e seu nível de poder x interesse.</p>
+          <table id="tblStake">
+            <thead>
+              <tr>
+                <th>Agente</th>
+                <th>Hélice</th>
+                <th>Papel</th>
+                <th>Poder x Interesse</th>
+                <th style="width:90px"></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div style="margin-top:10px"><button class="btn" id="addStake">+ Adicionar stakeholder</button></div>
+        </div>
+        <div class="col">
+          <p class="help">Defina propósito, método e entregas do projeto.</p>
+          <label>Por quê (propósito)</label>
+          <textarea id="porque"></textarea>
+          <label>Como (método)</label>
+          <textarea id="como"></textarea>
+          <label>O quê (entregas)</label>
+          <textarea id="oque"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. MODELO C COMPLETO -->
+    <section class="avoid-break">
+      <h2><span class="emoji">🍃</span>3) Planejamento — Modelo C</h2>
+      <p class="help">Estruture o plano de negócio e a teoria da mudança (referência Modelo C).</p>
+      <table>
+        <thead>
+          <tr><th>Plano de Negócio</th><th>Teoria da Mudança</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Oportunidade de mercado</strong><textarea id="mkt"></textarea></td><td><strong>Contexto e problema</strong><textarea id="prob"></textarea></td></tr>
+          <tr><td><strong>Proposta de valor</strong><textarea id="valor"></textarea></td><td><strong>Intervenções (estratégias)</strong><textarea id="intv"></textarea></td></tr>
+          <tr><td><strong>Fontes de receita</strong><textarea id="receita"></textarea></td><td><strong>Resultados de curto prazo</strong><textarea id="curto"></textarea></td></tr>
+          <tr><td><strong>Recursos e custos</strong><textarea id="recursos"></textarea></td><td><strong>Resultados de médio prazo</strong><textarea id="medio"></textarea></td></tr>
+          <tr><td colspan="2"><strong>Visão de impacto</strong><textarea id="impacto"></textarea></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 4. OKRS + ESG + RISCOS -->
+    <section class="avoid-break">
+      <h2><span class="emoji">🌱</span>4) OKRs, Métricas ESG e Riscos</h2>
+      <p class="help">Defina objetivos, resultados-chave e métricas ESG. Adicione quantos OKRs precisar.</p>
+      <table id="tblOkrs">
+        <thead>
+          <tr><th>Objetivo</th><th>KR (mensurável)</th><th>Prazo</th><th>Responsável</th><th style="width:90px"></th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div style="margin-top:10px"><button class="btn" id="addOkr">+ Adicionar OKR</button></div>
+      <div class="row" style="margin-top:14px">
+        <div class="col"><label>Métricas ESG (Ambiental / Social / Governança)</label><textarea id="esg"></textarea></div>
+        <div class="col"><label>Riscos & Mitigações</label><textarea id="riscos"></textarea></div>
+      </div>
+    </section>
+
+    <!-- 5. JORNADA NUMERADA -->
+    <section class="avoid-break">
+      <h2><span class="emoji">🌲</span>5) Jornada / Linha do tempo</h2>
+      <p class="help">Adicione as fases; a numeração cresce automaticamente.</p>
+      <table id="tblTimeline">
+        <thead>
+          <tr><th style="width:60px">#</th><th>Fase</th><th>Início</th><th>Término</th><th>Marcos</th><th>Responsável</th><th style="width:90px"></th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div style="margin-top:10px"><button class="btn" id="addPhase">+ Adicionar fase</button></div>
+    </section>
+
+    <!-- 6. RESUMO EM CANVAS/TABELAS -->
+    <section class="avoid-break">
+      <h2><span class="emoji">🪴</span>6) Resumo (Canvas/Tabelas)</h2>
+      <p class="help">Gere um resumo visual em tabelas (não bloco de texto). Ideal para colar no relatório ou exportar em PDF.</p>
+      <button class="btn" id="genResumo">Gerar resumo</button>
+      <div id="resumo" style="margin-top:12px"></div>
+    </section>
+  </main>
+
+  <script>
+    const $=(s,ctx=document)=>ctx.querySelector(s);
+    const $$=(s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
+    const KEY='canva-life-4h-v4';
+
+    // ====== STAKEHOLDERS ======
+    function addStakeRow(data={}){
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td><input type="text" value="${data.agente||''}" placeholder="Secretaria, ONG, empresa, curso..."></td>
+        <td>
+          <select>
+            <option ${data.helix==='Governo'?'selected':''}>Governo</option>
+            <option ${data.helix==='Indústria'?'selected':''}>Indústria</option>
+            <option ${data.helix==='Academia'?'selected':''}>Academia</option>
+            <option ${data.helix==='Sociedade Civil'?'selected':''}>Sociedade Civil</option>
+          </select>
+        </td>
+        <td><input type="text" value="${data.papel||''}" placeholder="O que fará"></td>
+        <td><input type="text" value="${data.poder||''}" placeholder="Alto / Médio / Baixo"></td>
+        <td><button class="btn" onclick="this.closest('tr').remove()" style="display:block;margin:auto;">Remover</button></td>`;
+      $('#tblStake tbody').appendChild(tr);
+    }
+    $('#addStake').addEventListener('click',()=>addStakeRow());
+    addStakeRow();
+
+    // ====== OKRS ======
+    function addOkrRow(data={}){
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td><input type="text" value="${data.obj||''}" placeholder="Objetivo"></td>
+        <td><input type="text" value="${data.kr||''}" placeholder="Resultado-chave (mensurável)"></td>
+        <td><input type="text" value="${data.prazo||''}" placeholder="2025-Q2 / 30 dias..."></td>
+        <td><input type="text" value="${data.owner||''}" placeholder="Responsável"></td>
+        <td><button class="btn" onclick="this.closest('tr').remove()" style="display:block;margin:auto;">Remover</button></td>`;
+      $('#tblOkrs tbody').appendChild(tr);
+    }
+    $('#addOkr').addEventListener('click',()=>addOkrRow());
+    addOkrRow();
+
+    // ====== JORNADA NUMERADA ======
+    function reindexPhases(){ $$('#tblTimeline tbody tr .num').forEach((td,i)=>td.textContent=i+1); }
+    function addPhaseRow(data={}){
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td class="num"></td>
+        <td><input type="text" value="${data.fase||''}" placeholder="Diagnóstico / Piloto / Execução..."></td>
+        <td><input type="date" value="${data.inicio||''}"></td>
+        <td><input type="date" value="${data.fim||''}"></td>
+        <td><input type="text" value="${data.marcos||''}" placeholder="Entregas, eventos, aprovações"></td>
+        <td><input type="text" value="${data.owner||''}" placeholder="Responsável"></td>
+        <td><button class="btn" onclick="this.closest('tr').remove(); reindexPhases()" style="display:block;margin:auto;">Remover</button></td>`;
+      $('#tblTimeline tbody').appendChild(tr);
+      reindexPhases();
+    }
+    $('#addPhase').addEventListener('click',()=>addPhaseRow());
+    addPhaseRow();
+
+    // ====== RESUMO (TABELAS) ======
+    $('#genResumo').addEventListener('click',()=>{
+      const blocks=$$('section table');
+      const wrap=document.createElement('div');
+      blocks.forEach(t=>{
+        const clone=t.cloneNode(true);
+        // remove coluna de ações
+        $$('th:last-child, td:last-child', clone).forEach(el=>{
+          if(el.textContent.trim()===''||el.textContent.includes('Remover')) el.remove();
+        });
+        clone.style.margin='12px 0';
+        wrap.appendChild(clone);
+      });
+      const resumo=$('#resumo');
+      resumo.innerHTML='';
+      resumo.appendChild(wrap);
+      window.scrollTo({top:resumo.offsetTop-80,behavior:'smooth'});
+    });
+
+    // ====== SALVAR / CARREGAR ======
+    function collect(){
+      const data={
+        desafio:$('#desafio').value, contexto:$('#contexto').value,
+        stakeholders: $$('#tblStake tbody tr').map(tr=>{
+          const tds=$$('td',tr); return {
+            agente: tds[0].querySelector('input').value,
+            helix:  tds[1].querySelector('select').value,
+            papel:  tds[2].querySelector('input').value,
+            poder:  tds[3].querySelector('input').value,
+          };
+        }),
+        porque:$('#porque').value, como:$('#como').value, oque:$('#oque').value,
+        modeloC:{ mkt:$('#mkt').value, prob:$('#prob').value, valor:$('#valor').value, intv:$('#intv').value, receita:$('#receita').value, curto:$('#curto').value, recursos:$('#recursos').value, medio:$('#medio').value, impacto:$('#impacto').value },
+        okrs: $$('#tblOkrs tbody tr').map(tr=>{ const tds=$$('td',tr); return { obj: tds[0].querySelector('input').value, kr: tds[1].querySelector('input').value, prazo: tds[2].querySelector('input').value, owner: tds[3].querySelector('input').value }; }),
+        esg:$('#esg').value, riscos:$('#riscos').value,
+        timeline: $$('#tblTimeline tbody tr').map(tr=>{ const tds=$$('td',tr); return { fase: tds[1].querySelector('input').value, inicio: tds[2].querySelector('input').value, fim: tds[3].querySelector('input').value, marcos: tds[4].querySelector('input').value, owner: tds[5].querySelector('input').value }; })
+      };
+      return data;
+    }
+    function fill(d){
+      $('#desafio').value=d.desafio||''; $('#contexto').value=d.contexto||'';
+      $('#tblStake tbody').innerHTML=''; (d.stakeholders||[]).forEach(addStakeRow);
+      $('#porque').value=d.porque||''; $('#como').value=d.como||''; $('#oque').value=d.oque||'';
+      const mc=d.modeloC||{}; ['mkt','prob','valor','intv','receita','curto','recursos','medio','impacto'].forEach(k=>$('#'+k).value=(mc[k]||''));
+      $('#tblOkrs tbody').innerHTML=''; (d.okrs||[]).forEach(addOkrRow);
+      $('#esg').value=d.esg||''; $('#riscos').value=d.riscos||'';
+      $('#tblTimeline tbody').innerHTML=''; (d.timeline||[]).forEach(addPhaseRow);
+      $$('#tblTimeline tbody tr .num').forEach((td,i)=>td.textContent=i+1);
+    }
+    $('#saveBtn').addEventListener('click',()=>{ localStorage.setItem(KEY, JSON.stringify(collect())); $('#status').textContent='Salvo'; });
+    $('#loadBtn').addEventListener('click',()=>{ const raw=localStorage.getItem(KEY); if(raw){ fill(JSON.parse(raw)); $('#status').textContent='Carregado'; }});
+
+    // ====== EXPORTAR PNG ======
+    $('#exportPngBtn').addEventListener('click',async()=>{
+      const node=document.getElementById('captureArea');
+      const canvas=await html2canvas(node,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
+      const link=document.createElement('a');
+      link.download='canva-life-4h.png';
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // ====== EXPORTAR PDF (html2pdf) ======
+    $('#exportPdfBtn').addEventListener('click', async ()=>{
+      const element=document.getElementById('captureArea');
+      const opt={
+        margin:[20,20,20,20],
+        filename:'canva-life-4h.pdf',
+        image:{type:'jpeg',quality:0.98},
+        html2canvas:{scale:2,useCORS:true,scrollY:0,backgroundColor:'#ffffff'},
+        jsPDF:{unit:'pt',format:'a4',orientation:'portrait'},
+        pagebreak:{mode:['css','legacy'],avoid:['table','tr','section','.avoid-break']}
+      };
+      await html2pdf().set(opt).from(element).save();
+    });
+  </script>
+</body>
+</html>
